@@ -7,8 +7,20 @@ type Pair struct {
 	Tail Sexp
 }
 
+var cache []*Pair
+
 func NewPair(head, tail Sexp) *Pair {
+	if len(cache) > 0 {
+		var pair *Pair
+		pair, cache = cache[0], cache[1:]
+		return pair
+	}
+
 	return &Pair{Head: head, Tail: tail}
+}
+
+func ReleasePair(pair *Pair) {
+	cache = append(cache, pair)
 }
 
 func (s *Pair) SexpString() string {

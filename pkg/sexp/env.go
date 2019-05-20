@@ -6,18 +6,18 @@ import (
 
 type Env struct {
 	parent *Env
-	data   map[uint64]Sexp
+	data   map[Symbol]Sexp
 }
 
 func NewEnv() *Env {
-	return &Env{data: map[uint64]Sexp{}}
+	return &Env{data: map[Symbol]Sexp{}}
 }
 
 func (s *Env) Wrap() *Env {
-	return &Env{parent: s, data: map[uint64]Sexp{}}
+	return &Env{parent: s, data: map[Symbol]Sexp{}}
 }
 
-func (s *Env) WrapMap(m map[uint64]Sexp) *Env {
+func (s *Env) WrapMap(m map[Symbol]Sexp) *Env {
 	return &Env{parent: s, data: m}
 }
 
@@ -29,9 +29,9 @@ func (s *Env) Unwrap() *Env {
 	panic("unwrap global env")
 }
 
-func (s *Env) GetRawData() map[uint64]Sexp {
+func (s *Env) GetRawData() map[Symbol]Sexp {
 	env := s
-	data := map[uint64]Sexp{}
+	data := map[Symbol]Sexp{}
 	for env != nil {
 		for k, v := range env.data {
 			data[k] = v
@@ -45,20 +45,20 @@ func (s *Env) String() string {
 	return fmt.Sprintf("envlen:%d", len(s.data))
 }
 
-func (s *Env) SetGlobal(key *Symbol, value Sexp) {
+func (s *Env) SetGlobal(key Symbol, value Sexp) {
 	ss := s
 	for ss.parent != nil {
 		ss = ss.parent
 	}
-	ss.data[key.Code] = value
+	ss.data[key] = value
 }
 
-func (s *Env) SetLocal(key *Symbol, value Sexp) {
-	s.data[key.Code] = value
+func (s *Env) SetLocal(key Symbol, value Sexp) {
+	s.data[key] = value
 }
 
-func (s *Env) Get(key *Symbol) Sexp {
-	if v, ok := s.data[key.Code]; ok {
+func (s *Env) Get(key Symbol) Sexp {
+	if v, ok := s.data[key]; ok {
 		return v
 	}
 

@@ -5,8 +5,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/naphaso/nlisp/pkg/symbol"
-
 	"github.com/naphaso/nlisp/pkg/lexer"
 	"github.com/naphaso/nlisp/pkg/sexp"
 )
@@ -62,17 +60,17 @@ func (s *parser) Read() (sexp.Sexp, error) {
 				return ex, nil
 			}
 		case lexer.TokenSymbol:
-			ex = symbol.ByName(token.Value)
+			ex = sexp.NewSymbol(token.Value)
 			if !s.stack.Add(ex) {
 				return ex, nil
 			}
 		case lexer.TokenQSymbol:
-			ex = sexp.List(symbol.ByName("quote"), symbol.ByName(token.Value))
+			ex = sexp.List(sexp.NewSymbol("quote"), sexp.NewSymbol(token.Value))
 			if !s.stack.Add(ex) {
 				return ex, nil
 			}
 		case lexer.TokenCSymbol:
-			ex = sexp.List(symbol.ByName("comma"), symbol.ByName(token.Value))
+			ex = sexp.List(sexp.NewSymbol("comma"), sexp.NewSymbol(token.Value))
 			if !s.stack.Add(ex) {
 				return ex, nil
 			}
@@ -103,11 +101,11 @@ func (s *parser) Read() (sexp.Sexp, error) {
 			}
 
 			if quoted {
-				ex = sexp.List(symbol.ByName("quote"), ex)
+				ex = sexp.List(sexp.NewSymbol("quote"), ex)
 			} else if comma {
-				ex = sexp.List(symbol.ByName("comma"), ex)
+				ex = sexp.List(sexp.NewSymbol("comma"), ex)
 			} else if backquote {
-				ex = sexp.NewPair(symbol.ByName("backquote"), ex)
+				ex = sexp.NewPair(sexp.NewSymbol("backquote"), ex)
 			}
 
 			if !s.stack.Add(ex) {

@@ -53,6 +53,11 @@ func TestFib(t *testing.T) {
 `, `9227465`)
 }
 
+func TestEvalFunc(t *testing.T) {
+	check(t, `(eval plus 2 3))`, `5`)
+	check(t, `(eval list 1 2 (plus 1 2))`, `(1 2 3)`)
+}
+
 func BenchmarkFib(b *testing.B) {
 	env := Global.Wrap()
 	//fib, err := parser.ParseString("(defun fib (n) (cond (less n 2) n (plus (fib (sub n 1)) (fib (sub n 2))))))")
@@ -72,7 +77,7 @@ func BenchmarkFib(b *testing.B) {
 
 		fmt.Printf("time: %s\n", t2.Sub(t1))
 		require.NoError(b, err)
-		require.Equal(b, result.(*sexp.Int64).Value, int64(9227465))
+		require.Equal(b, int64(result.(sexp.Int64)), int64(9227465))
 	}
 }
 

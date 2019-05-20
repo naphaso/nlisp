@@ -7,7 +7,6 @@ import (
 	"github.com/naphaso/nlisp/pkg/lexer"
 	"github.com/naphaso/nlisp/pkg/parser"
 	"github.com/naphaso/nlisp/pkg/sexp"
-	"github.com/naphaso/nlisp/pkg/symbol"
 )
 
 var Global *sexp.Env
@@ -20,30 +19,36 @@ var Prelude = "(setq defmacro (macro (name args body) `(setq ,name (macro ,args 
 
 func init() {
 	Global = sexp.NewEnv()
-	reg := func(name string, f func(sexp.Sexp, *sexp.Env) (sexp.Sexp, error)) {
-		Global.SetLocal(symbol.ByName(name), sexp.NewFunc(f))
+	reg := func(name string, f sexp.RawFunc, c sexp.CompileFunc) {
+		Global.SetLocal(sexp.NewSymbol(name), sexp.NewFunc(f, c))
 	}
 
-	reg("plus", plus)
-	reg("mul", mul)
-	reg("list", list)
+	reg("plus", plus, optimizePlus)
+	reg("mul", mul, nil)
+	reg("list", list, nil)
 
-	reg("setq", setq)
-	reg("format", format)
-	reg("lambda", lambda)
-	reg("progn", progn)
+	reg("setq", setq, nil)
+	reg("format", format, nil)
+	reg("lambda", lambda, nil)
+	reg("progn", progn, nil)
 
-	reg("quote", quote)
-	reg("backquote", backquote)
-	reg("macro", macro)
-	reg("error", funcError)
+	reg("quote", quote, nil)
+	reg("backquote", backquote, nil)
+	reg("macro", macro, nil)
+	reg("error", funcError, nil)
 
-	reg("cond", cond)
-	reg("equal", equal)
-	reg("less", less)
-	reg("sub", sub)
-	reg("print", funcPrint)
-	reg("println", funcPrintln)
+	reg("cond", cond, optimizeCond)
+	reg("equal", equal, nil)
+	reg("less", less, optimizeLess)
+	reg("sub", sub, optimizeSub)
+	reg("print", funcPrint, nil)
+	reg("println", funcPrintln, nil)
+
+	reg("timeit", timeit, nil)
+
+	reg("compile", compile, nil)
+
+	reg("eval", Eval, nil)
 
 	p := parser.New(lexer.New(strings.NewReader(Prelude)))
 	for {

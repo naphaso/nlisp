@@ -103,3 +103,46 @@ func (s *ListBuilder) Append(v Sexp) {
 func (s *ListBuilder) Build() Sexp {
 	return s.head
 }
+
+func ExtractTwoArgs(args Sexp) (Sexp, Sexp, error) {
+	p, ok := args.(*Pair)
+	if !ok {
+		return nil, nil, errors.New("invalid arguments")
+	}
+
+	a1 := p.Head
+
+	p, ok = p.Tail.(*Pair)
+	if !ok {
+		return nil, nil, errors.New("invalid arguments")
+	}
+
+	a2 := p.Head
+
+	return a1, a2, nil
+}
+
+func ExtractThreeArgs(args Sexp) (Sexp, Sexp, Sexp, error) {
+	p, ok := args.(*Pair)
+	if !ok {
+		return nil, nil, nil, errors.New("invalid arguments")
+	}
+
+	a1 := p.Head
+
+	p, ok = p.Tail.(*Pair)
+	if !ok {
+		return nil, nil, nil, errors.New("invalid arguments")
+	}
+
+	a2 := p.Head
+
+	p, ok = p.Tail.(*Pair)
+	if !ok {
+		return nil, nil, nil, errors.New("invalid arguments")
+	}
+
+	a3 := p.Head
+
+	return a1, a2, a3, nil
+}

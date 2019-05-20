@@ -19,7 +19,7 @@ func setq(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 		return nil, errors.New("invalid arguments in set")
 	}
 
-	if key, ok := key.(*sexp.Symbol); ok {
+	if key, ok := key.(sexp.Symbol); ok {
 		value, err := Eval(p.Head, en)
 		if err != nil {
 			return nil, err

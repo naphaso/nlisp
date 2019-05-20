@@ -20,8 +20,8 @@ func mul(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 			return nil, err
 		}
 
-		if vv, ok := r.(*sexp.Int64); ok {
-			v *= vv.Value
+		if vv, ok := r.(sexp.Int64); ok {
+			v *= int64(vv)
 		} else {
 			return nil, errors.New("mul currently supports only int64 arguments, not " + fmt.Sprintf("%T", p.Head))
 		}

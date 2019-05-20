@@ -17,8 +17,10 @@ func Eval(e sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 		}
 
 		switch opc := op.(type) {
-		case sexp.Func:
-			return opc(ev.Tail, en)
+		case *sexp.Func:
+			return opc.Raw(ev.Tail, en)
+		case *sexp.Compiled:
+			return opc.Code.Eval(en)
 		case *sexp.Lambda:
 			return evalLambda(opc, ev.Tail, en)
 		case *sexp.Macro:
@@ -30,9 +32,11 @@ func Eval(e sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 		default:
 			return nil, errors.New("is not a function: " + fmt.Sprintf("%T", op))
 		}
-	case *sexp.Symbol:
+	case sexp.Symbol:
 		//fmt.Printf("symbol %s = %s\n", ev.Name, sexp.ToString(en.Get(ev)))
 		return en.Get(ev), nil
+	case *sexp.Compiled:
+		return ev.Code.Eval(en)
 	default:
 		return e, nil
 	}
@@ -52,7 +56,7 @@ func evalLambda(lam *sexp.Lambda, args sexp.Sexp, en *sexp.Env) (sexp.Sexp, erro
 			return nil, errors.New("lambda arguments fail")
 		}
 
-		dargSym, ok := darg.Head.(*sexp.Symbol)
+		dargSym, ok := darg.Head.(sexp.Symbol)
 		if !ok {
 			return nil, errors.New("lambda signature fail")
 		}
@@ -90,7 +94,7 @@ func evalMacro(lam *sexp.Macro, args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error)
 			return nil, errors.New("macro arguments fail")
 		}
 
-		dargSym, ok := darg.Head.(*sexp.Symbol)
+		dargSym, ok := darg.Head.(sexp.Symbol)
 		if !ok {
 			return nil, errors.New("macro signature fail")
 		}
@@ -111,7 +115,26 @@ func evalMacro(lam *sexp.Macro, args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error)
 	return res, nil
 }
 
-func EvalList(list sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
+func EvalList(list sexp.Sexp, env *sexp.Env) (sexp.Sexp, error) {
+	b := sexp.NewListBuilder()
+	for list != nil {
+		p, ok := list.(*sexp.Pair)
+		if !ok {
+			return nil, errors.New("not a list")
+		}
+
+		v, err := Eval(p.Head, env)
+		if err != nil {
+			return nil, err
+		}
+		b.Append(v)
+
+		list = p.Tail
+	}
+	return b.Build(), nil
+}
+
+func EvalList2(list sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 	arr := make([]sexp.Sexp, 0, 10)
 	for list != nil {
 		p, ok := list.(*sexp.Pair)

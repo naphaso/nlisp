@@ -37,8 +37,8 @@ func format(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 		r, err = Eval(p.Head, en)
 
 		switch v := r.(type) {
-		case *sexp.Int64:
-			fargs = append(fargs, v.Value)
+		case sexp.Int64:
+			fargs = append(fargs, int64(v))
 		case *sexp.String:
 			fargs = append(fargs, v.Value)
 		default:
@@ -66,7 +66,7 @@ func funcPrint(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 	if head, ok := r.(*sexp.String); ok {
 		data = head.Value
 	} else {
-		data = head.SexpString()
+		data = sexp.ToString(r)
 	}
 
 	fmt.Print(data)

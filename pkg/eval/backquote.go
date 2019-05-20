@@ -6,6 +6,8 @@ import (
 	"github.com/naphaso/nlisp/pkg/sexp"
 )
 
+var symbolComma = sexp.NewSymbol("comma")
+
 func backquote(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 	//fmt.Printf("backquote: %s\n", args.SexpString())
 	builder := sexp.NewListBuilder()
@@ -19,8 +21,8 @@ func backquote(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 		args = p.Tail
 
 		if fpair, ok := p.Head.(*sexp.Pair); ok {
-			if fpsym, ok := fpair.Head.(*sexp.Symbol); ok {
-				if fpsym.Name == "comma" {
+			if fpsym, ok := fpair.Head.(sexp.Symbol); ok {
+				if fpsym == symbolComma {
 					if spair, ok := fpair.Tail.(*sexp.Pair); ok {
 						curr, err := Eval(spair.Head, en)
 						if err != nil {

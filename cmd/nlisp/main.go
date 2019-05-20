@@ -7,8 +7,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/naphaso/nlisp/pkg/symbol"
-
 	"github.com/c-bata/go-prompt"
 
 	"github.com/naphaso/nlisp/pkg/lexer"
@@ -67,18 +65,17 @@ func (s *Completer) Refresh() {
 			Description: "Kill this shit",
 		},
 	}
-	for code, value := range s.Env.GetRawData() {
-		name := symbol.ByCode(code)
+	for sym, value := range s.Env.GetRawData() {
 		var desc string
 		switch v := value.(type) {
-		case sexp.Func:
+		case *sexp.Func:
 			desc = "function"
 		case *sexp.Lambda:
 			desc = v.SexpString()
 		case *sexp.Macro:
 			desc = v.SexpString()
-		case *sexp.Int64:
-			desc = fmt.Sprintf("int64 %d", v.Value)
+		case sexp.Int64:
+			desc = fmt.Sprintf("int64 %d", int64(v))
 		case *sexp.String:
 			desc = fmt.Sprintf("string %q", v.Value)
 		case *sexp.Bool:
@@ -94,7 +91,7 @@ func (s *Completer) Refresh() {
 		}
 
 		data = append(data, prompt.Suggest{
-			Text:        name.Name,
+			Text:        sym.Name(),
 			Description: desc,
 		})
 	}
