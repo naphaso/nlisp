@@ -11,7 +11,7 @@ func funcError(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 		return nil, errors.New("unknown error")
 	}
 
-	p, ok := args.(*sexp.Pair)
+	p, ok := args.(sexp.Pair)
 	if !ok {
 		return nil, errors.New("unknown error arguments")
 	}

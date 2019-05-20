@@ -10,8 +10,8 @@ func progn(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 	var r sexp.Sexp
 	var err error
 	//fmt.Printf("progn: %s\n", args.SexpString())
-	for args != nil {
-		p, ok := args.(*sexp.Pair)
+	for args != sexp.Nil {
+		p, ok := args.(sexp.Pair)
 		if !ok {
 			return nil, errors.New("invalid argument list")
 		}

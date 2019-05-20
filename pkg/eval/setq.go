@@ -7,14 +7,14 @@ import (
 )
 
 func setq(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
-	p, ok := args.(*sexp.Pair)
+	p, ok := args.(sexp.Pair)
 	if !ok {
 		return nil, errors.New("invalid arguments in set")
 	}
 
 	key := p.Head
 
-	p, ok = p.Tail.(*sexp.Pair)
+	p, ok = p.Tail.(sexp.Pair)
 	if !ok {
 		return nil, errors.New("invalid arguments in set")
 	}
@@ -26,7 +26,7 @@ func setq(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 		}
 		//fmt.Printf("setq %s = %s\n", key.Name, value.SexpString())
 		en.SetGlobal(key, value)
-		return nil, nil
+		return sexp.Nil, nil
 	} else {
 		return nil, errors.New("first argument in set is not a symbol")
 	}

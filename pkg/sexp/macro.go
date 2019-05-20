@@ -15,7 +15,7 @@ func NewMacro(args Sexp, body Sexp, e *Env) *Macro {
 }
 
 func (s *Macro) SexpString() string {
-	return "(macro " + ToString(s.Args) + " " + ToString(s.Body) + ")"
+	return "(macro " + s.Args.SexpString() + " " + s.Body.SexpString() + ")"
 }
 
 func (s *Macro) Equal(o Sexp) bool {

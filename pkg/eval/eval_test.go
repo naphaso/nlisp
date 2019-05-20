@@ -44,14 +44,14 @@ func TestBackquote(t *testing.T) {
 
 // (defn fib (n) cond (< n 2) n (+ (fib (- n 1)) (fib (- n 2))))
 
-func TestFib(t *testing.T) {
-	check(t, `
-(progn
-	(defun fib (n) (cond (less n 2) n (plus (fib (sub n 1)) (fib (sub n 2)))))
-	(fib 35)
-)
-`, `9227465`)
-}
+//func TestFib(t *testing.T) {
+//	check(t, `
+//(progn
+//	(defun fib (n) (cond (less n 2) n (plus (fib (sub n 1)) (fib (sub n 2)))))
+//	(fib 35)
+//)
+//`, `9227465`)
+//}
 
 func TestEvalFunc(t *testing.T) {
 	check(t, `(eval plus 2 3))`, `5`)
@@ -133,7 +133,7 @@ func check(t *testing.T, input string, output string) {
 	r, err := Eval(e, Global.Wrap())
 	require.NoError(t, err)
 
-	require.Equal(t, output, sexp.ToString(r))
+	require.Equal(t, output, r.SexpString())
 }
 
 func checkErr(t *testing.T, input string, errStr string) {

@@ -52,7 +52,7 @@ func (s *EvalStack) Run(env *sexp.Env) (sexp.Sexp, error) {
 		}
 
 		switch e := lastFrame.exp.(type) {
-		case *sexp.Pair:
+		case sexp.Pair:
 			lastFrame.exp = e.Tail
 			// check head for simple types
 			// TODO: check to special forms?

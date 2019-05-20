@@ -2,49 +2,11 @@ package sexp
 
 import (
 	"errors"
-	"unsafe"
 )
 
 type Sexp interface {
 	SexpString() string
 	Equal(o Sexp) bool
-}
-
-func ToString(v Sexp) string {
-	if v == nil {
-		return "nil"
-	}
-
-	return v.SexpString()
-}
-
-// deprecated
-func IsNil(v Sexp) bool {
-	// slow implementation with reflect
-	//return i == nil || reflect.ValueOf(i).IsNil()
-
-	// slow implementation with type switch
-	//switch vv := v.(type) {
-	//case *Pair:
-	//	return vv == nil
-	//case *String:
-	//	return vv == nil
-	//case *Bool:
-	//	return vv == nil
-	//case *Symbol:
-	//	return vv == nil
-	//case *Int64:
-	//	return vv == nil
-	//case *Float64:
-	//	return vv == nil
-	//case *Rune:
-	//	return vv == nil
-	//default:
-	//	return i == nil || reflect.ValueOf(i).IsNil()
-	//}
-
-	// fast unsafe implementation
-	return (*[2]uintptr)(unsafe.Pointer(&v))[1] == 0
 }
 
 func IsList() bool {
@@ -53,10 +15,10 @@ func IsList() bool {
 
 func ToArray(e Sexp) ([]Sexp, error) {
 	var el []Sexp
-	var curr *Pair
+	var curr Pair
 	var ok bool
-	for e != nil {
-		curr, ok = e.(*Pair)
+	for e != Nil {
+		curr, ok = e.(Pair)
 		if !ok {
 			return nil, errors.New("not a list")
 		}
@@ -69,7 +31,7 @@ func ToArray(e Sexp) ([]Sexp, error) {
 }
 
 func NewList(elements []Sexp) Sexp {
-	var root Sexp
+	root := Nil
 	for i := len(elements) - 1; i >= 0; i-- {
 		root = NewPair(elements[i], root)
 	}
@@ -85,34 +47,31 @@ func NewListBuilder() *ListBuilder {
 }
 
 type ListBuilder struct {
-	head *Pair
-	tail *Pair
+	list []Sexp
 }
 
 func (s *ListBuilder) Append(v Sexp) {
-	node := NewPair(v, nil)
-	if s.head == nil {
-		s.head = node
-		s.tail = node
-	} else {
-		s.tail.Tail = node
-		s.tail = node
-	}
+	s.list = append(s.list, v)
 }
 
 func (s *ListBuilder) Build() Sexp {
-	return s.head
+	// probably there is better way to build this list?
+	var root Sexp = Nil
+	for i := len(s.list) - 1; i >= 0; i-- {
+		root = NewPair(s.list[i], root)
+	}
+	return root
 }
 
 func ExtractTwoArgs(args Sexp) (Sexp, Sexp, error) {
-	p, ok := args.(*Pair)
+	p, ok := args.(Pair)
 	if !ok {
 		return nil, nil, errors.New("invalid arguments")
 	}
 
 	a1 := p.Head
 
-	p, ok = p.Tail.(*Pair)
+	p, ok = p.Tail.(Pair)
 	if !ok {
 		return nil, nil, errors.New("invalid arguments")
 	}
@@ -123,21 +82,21 @@ func ExtractTwoArgs(args Sexp) (Sexp, Sexp, error) {
 }
 
 func ExtractThreeArgs(args Sexp) (Sexp, Sexp, Sexp, error) {
-	p, ok := args.(*Pair)
+	p, ok := args.(Pair)
 	if !ok {
 		return nil, nil, nil, errors.New("invalid arguments")
 	}
 
 	a1 := p.Head
 
-	p, ok = p.Tail.(*Pair)
+	p, ok = p.Tail.(Pair)
 	if !ok {
 		return nil, nil, nil, errors.New("invalid arguments")
 	}
 
 	a2 := p.Head
 
-	p, ok = p.Tail.(*Pair)
+	p, ok = p.Tail.(Pair)
 	if !ok {
 		return nil, nil, nil, errors.New("invalid arguments")
 	}

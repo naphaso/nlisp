@@ -9,8 +9,8 @@ import (
 
 func mul(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 	var v int64 = 1
-	for args != nil {
-		p, ok := args.(*sexp.Pair)
+	for args != sexp.Nil {
+		p, ok := args.(sexp.Pair)
 		if !ok {
 			return nil, errors.New("invalid argument list")
 		}

@@ -10,7 +10,7 @@ import (
 func Eval(e sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 	//fmt.Printf("eval %s, env:%s\n", e.SexpString(), en.String())
 	switch ev := e.(type) {
-	case *sexp.Pair:
+	case sexp.Pair:
 		op, err := Eval(ev.Head, en)
 		if err != nil {
 			return nil, err
@@ -45,13 +45,13 @@ func Eval(e sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 func evalLambda(lam *sexp.Lambda, args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 	lambdaEnv := lam.Env.Wrap()
 	dargs := lam.Args
-	for args != nil && dargs != nil {
-		arg, ok := args.(*sexp.Pair)
+	for args != sexp.Nil && dargs != sexp.Nil {
+		arg, ok := args.(sexp.Pair)
 		if !ok {
 			return nil, errors.New("lambda arguments fail")
 		}
 
-		darg, ok := dargs.(*sexp.Pair)
+		darg, ok := dargs.(sexp.Pair)
 		if !ok {
 			return nil, errors.New("lambda arguments fail")
 		}
@@ -83,13 +83,13 @@ func evalLambda(lam *sexp.Lambda, args sexp.Sexp, en *sexp.Env) (sexp.Sexp, erro
 func evalMacro(lam *sexp.Macro, args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 	macroEnv := lam.Env.Wrap()
 	dargs := lam.Args
-	for args != nil && dargs != nil {
-		arg, ok := args.(*sexp.Pair)
+	for args != sexp.Nil && dargs != sexp.Nil {
+		arg, ok := args.(sexp.Pair)
 		if !ok {
 			return nil, errors.New("macro arguments fail")
 		}
 
-		darg, ok := dargs.(*sexp.Pair)
+		darg, ok := dargs.(sexp.Pair)
 		if !ok {
 			return nil, errors.New("macro arguments fail")
 		}
@@ -117,8 +117,8 @@ func evalMacro(lam *sexp.Macro, args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error)
 
 func EvalList(list sexp.Sexp, env *sexp.Env) (sexp.Sexp, error) {
 	b := sexp.NewListBuilder()
-	for list != nil {
-		p, ok := list.(*sexp.Pair)
+	for list != sexp.Nil {
+		p, ok := list.(sexp.Pair)
 		if !ok {
 			return nil, errors.New("not a list")
 		}
@@ -136,8 +136,8 @@ func EvalList(list sexp.Sexp, env *sexp.Env) (sexp.Sexp, error) {
 
 func EvalList2(list sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 	arr := make([]sexp.Sexp, 0, 10)
-	for list != nil {
-		p, ok := list.(*sexp.Pair)
+	for list != sexp.Nil {
+		p, ok := list.(sexp.Pair)
 		if !ok {
 			return nil, errors.New("not a list")
 		}

@@ -15,7 +15,7 @@ func NewLambda(args Sexp, body Sexp, e *Env) *Lambda {
 }
 
 func (s *Lambda) SexpString() string {
-	return "(lambda " + ToString(s.Args) + " " + ToString(s.Body) + ")"
+	return "(lambda " + s.Args.SexpString() + " " + s.Body.SexpString() + ")"
 }
 
 func (s *Lambda) Equal(o Sexp) bool {

@@ -9,7 +9,7 @@ import (
 
 // TODO: implement timeit function to beasure benchmarks
 func timeit(args sexp.Sexp, ev *sexp.Env) (sexp.Sexp, error) {
-	p, ok := args.(*sexp.Pair)
+	p, ok := args.(sexp.Pair)
 	if !ok {
 		return nil, errors.New("invalid arguments in timeit")
 	}

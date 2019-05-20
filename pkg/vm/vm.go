@@ -69,12 +69,12 @@ func (s *VM) evalEval() error {
 	switch ev := e.(type) {
 	case *sexp.Int64:
 		s.stack2.Push(e)
-	case *sexp.Symbol:
+	case sexp.Symbol:
 		s.stack2.Push(s.env.Get(ev))
-	case *sexp.Pair:
+	case sexp.Pair:
 		s.stack2.Push(symbolPlus)
 		for e != nil {
-			p, ok := e.(*sexp.Pair)
+			p, ok := e.(sexp.Pair)
 			if !ok {
 				return errors.New("not a pair")
 			}
@@ -97,12 +97,12 @@ func (s *VM) evalPlus() error {
 			break
 		}
 
-		ei, ok := e.(*sexp.Int64)
+		ei, ok := e.(sexp.Int64)
 		if !ok {
 			return errors.New("plus not integer")
 		}
 
-		value += ei.Value
+		value += int64(ei)
 	}
 	return nil
 }

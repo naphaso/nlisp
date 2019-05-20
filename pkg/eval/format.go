@@ -8,7 +8,7 @@ import (
 )
 
 func format(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
-	p, ok := args.(*sexp.Pair)
+	p, ok := args.(sexp.Pair)
 	if !ok {
 		return nil, errors.New("invalid arguments in set")
 	}
@@ -28,8 +28,8 @@ func format(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 	args = p.Tail
 
 	var fargs []interface{}
-	for args != nil {
-		p, ok = args.(*sexp.Pair)
+	for args != sexp.Nil {
+		p, ok = args.(sexp.Pair)
 		if !ok {
 			return nil, errors.New("invalid argument list")
 		}
@@ -52,7 +52,7 @@ func format(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 }
 
 func funcPrint(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
-	p, ok := args.(*sexp.Pair)
+	p, ok := args.(sexp.Pair)
 	if !ok {
 		return nil, errors.New("invalid arguments in set")
 	}
@@ -66,7 +66,7 @@ func funcPrint(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 	if head, ok := r.(*sexp.String); ok {
 		data = head.Value
 	} else {
-		data = sexp.ToString(r)
+		data = r.SexpString()
 	}
 
 	fmt.Print(data)

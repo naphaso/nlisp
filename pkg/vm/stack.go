@@ -27,8 +27,8 @@ func (s *Stack) Pop() sexp.Sexp {
 }
 
 func (s *Stack) PushList(e sexp.Sexp) error {
-	for e != nil {
-		p, ok := e.(*sexp.Pair)
+	for e != sexp.Nil {
+		p, ok := e.(sexp.Pair)
 		if !ok {
 			return errors.New("not a list")
 		}
@@ -42,7 +42,7 @@ func (s *Stack) PushList(e sexp.Sexp) error {
 func (s *Stack) String() string {
 	var ss []string
 	for _, v := range s.stack {
-		ss = append(ss, sexp.ToString(v))
+		ss = append(ss, v.SexpString())
 	}
 
 	return "[" + strings.Join(ss, " ") + "]"

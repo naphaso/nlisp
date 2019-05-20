@@ -115,7 +115,7 @@ func (s *condSimple) Eval(env *sexp.Env) (sexp.Sexp, error) {
 }
 
 func popArg(args sexp.Sexp) (sexp.Sexp, sexp.Sexp, error) {
-	if p, ok := args.(*sexp.Pair); ok {
+	if p, ok := args.(sexp.Pair); ok {
 		return p.Head, p.Tail, nil
 	}
 

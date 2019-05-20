@@ -9,8 +9,8 @@ import (
 
 func plus(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 	var v int64
-	for args != nil {
-		p, ok := args.(*sexp.Pair)
+	for args != sexp.Nil {
+		p, ok := args.(sexp.Pair)
 		if !ok {
 			return nil, errors.New("invalid argument list")
 		}
@@ -33,7 +33,7 @@ func plus(args sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 }
 
 func optimizePlus(args sexp.Sexp, env *sexp.Env) (sexp.Sexp, error) {
-	if args == nil {
+	if args == sexp.Nil {
 		return sexp.NewInt64(0), nil
 	}
 
@@ -44,7 +44,7 @@ func optimizePlus(args sexp.Sexp, env *sexp.Env) (sexp.Sexp, error) {
 	}
 
 	// extract 1 arg
-	argsP, ok := args.(*sexp.Pair)
+	argsP, ok := args.(sexp.Pair)
 	if !ok {
 		return nil, errors.New("plus: invalid arguments")
 	}
@@ -52,12 +52,12 @@ func optimizePlus(args sexp.Sexp, env *sexp.Env) (sexp.Sexp, error) {
 	arg1 := argsP.Head
 
 	// if 1 arg
-	if argsP.Tail == nil {
+	if argsP.Tail == sexp.Nil {
 		return compileSexp(arg1, env)
 	}
 
 	// extract 2 arg
-	argsP, ok = argsP.Tail.(*sexp.Pair)
+	argsP, ok = argsP.Tail.(sexp.Pair)
 	if !ok {
 		return nil, errors.New("plus: invalid arguments")
 	}
@@ -65,7 +65,7 @@ func optimizePlus(args sexp.Sexp, env *sexp.Env) (sexp.Sexp, error) {
 	arg2 := argsP.Head
 
 	// if 2 arg
-	if argsP.Tail == nil {
+	if argsP.Tail == sexp.Nil {
 		if a1, ok := arg1.(sexp.Int64); ok {
 			if a2, ok := arg2.(sexp.Int64); ok {
 				return sexp.NewInt64(int64(a1) + int64(a2)), nil

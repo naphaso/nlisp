@@ -7,7 +7,7 @@ import (
 )
 
 func compileLambda(args sexp.Sexp, ev *sexp.Env) (sexp.Sexp, error) {
-	p, ok := args.(*sexp.Pair)
+	p, ok := args.(sexp.Pair)
 	if !ok {
 		return nil, errors.New("invalid arguments in timeit")
 	}
@@ -62,8 +62,8 @@ func compileCall(f, args sexp.Sexp, env *sexp.Env) (sexp.Sexp, error) {
 
 func compileList(list sexp.Sexp, env *sexp.Env) (sexp.Sexp, error) {
 	b := sexp.NewListBuilder()
-	for list != nil {
-		p, ok := list.(*sexp.Pair)
+	for list != sexp.Nil {
+		p, ok := list.(sexp.Pair)
 		if !ok {
 			return nil, errors.New("not a list")
 		}
@@ -88,12 +88,12 @@ func compile(args sexp.Sexp, env *sexp.Env) (sexp.Sexp, error) {
 		return nil, err
 	}
 
-	p, ok := args.(*sexp.Pair)
+	p, ok := args.(sexp.Pair)
 	if !ok {
 		return nil, errors.New("compile: invalid arguments")
 	}
 
-	if p.Tail != nil {
+	if p.Tail != sexp.Nil {
 		return nil, errors.New("compile: invalid arguments")
 	}
 
@@ -103,7 +103,7 @@ func compile(args sexp.Sexp, env *sexp.Env) (sexp.Sexp, error) {
 func compileSexp(e sexp.Sexp, en *sexp.Env) (sexp.Sexp, error) {
 	//fmt.Printf("compileSexp : %s\n", sexp.ToString(e))
 	switch ev := e.(type) {
-	case *sexp.Pair:
+	case sexp.Pair:
 		r, err := compileCall(ev.Head, ev.Tail, en)
 		if err == ErrCannotCompile {
 			return e, nil
